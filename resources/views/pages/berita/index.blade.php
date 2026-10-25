@@ -46,13 +46,14 @@
 
 <body class="bg-slate-50 font-sans antialiased text-slate-800">
 
-    <!-- Wrapper Utama Alpine.js State -->
+    <!-- Wrapper Utama Alpine.js State dengan Deteksi Parameter URL / Session -->
     <div x-data="{
         sidebarOpen: true,
         tambahModalOpen: false,
         editModalOpen: false,
         tahunModalOpen: false,
         pasteModalOpen: false,
+        laporanOpen: {{ request('laporan') == 'true' || session('laporanOpen') ? 'true' : 'false' }},
         inputTahunBaru: '',
         activeEditId: null,
         submitTahunBaru() {
@@ -70,69 +71,90 @@
 
             <!-- TOP NAVBAR -->
             <header
-                class="min-h-[64px] bg-white border-b border-slate-200/80 px-4 py-2 sm:px-6 z-20 shrink-0 relative shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-2">
+                class="min-h-[64px] bg-white border-b border-slate-200/80 px-3 py-2 sm:px-5 z-20 shrink-0 relative shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-2">
 
-                <!-- SISI KIRI: JUDUL DASHBOARD & LOGO SIARCOM MOBILE -->
+                <!-- SISI KIRI: JUDUL DASHBOARD, TOMBOL LAPORAN & LOGO MOBILE -->
                 <div class="flex items-center justify-between shrink-0 gap-3">
-                    <div class="flex items-center gap-2.5">
+                    <div class="flex items-center gap-2">
                         <div class="p-1.5 bg-teal-50 rounded-lg border border-teal-100/80 text-[#27B78F]">
                             <i class="fa-solid fa-newspaper text-sm"></i>
                         </div>
                         <div>
-                            <h1 class="text-sm sm:text-base font-black tracking-tight text-slate-900 leading-tight">
+                            <h1 class="text-xs sm:text-sm font-black tracking-tight text-slate-900 leading-tight">
                                 Dashboard Media Monitoring
                             </h1>
                         </div>
                     </div>
 
+                    <!-- TOMBOL TOGGLE LAPORAN DI HEADER (SEBELAH JUDUL - BERLAKU SEMUA UKURAN LAYAR) -->
+                    <button type="button"
+                        @click="
+                        console.log('KLIK LAPORAN');
+                        console.log('SEBELUM:', laporanOpen);
+                        laporanOpen = !laporanOpen;
+                        console.log('SESUDAH:', laporanOpen);
+                    "
+                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer bg-gradient-to-r from-[#27B78F] to-[#12B4C9] hover:opacity-90 text-white shrink-0 ml-2">
+
+                        <i class="fa-solid fa-file-lines"></i>
+                        <span>Laporan</span>
+
+                    </button>
+
                     <!-- Logo SIARCOM Mobile -->
                     <img src="{{ asset('img/siarcom.png') }}" alt="Logo SIARCOM"
-                        class="h-9 w-auto object-contain lg:hidden">
+                        class="h-8 w-auto object-contain xl:hidden">
                 </div>
 
                 <!-- SISI KANAN: GLOBAL FILTER BAR COMPACT + LOGO DESKTOP -->
-                <div class="flex items-center justify-between lg:justify-end gap-3 flex-1 min-w-0">
+                <div
+                    class="flex items-center justify-between xl:justify-end gap-2 flex-1 min-w-0 overflow-x-auto berita-scrollbar pb-1 xl:pb-0">
 
                     <form id="formGlobalFilter" method="GET" action="{{ route('pages.berita.index') }}"
-                        class="flex items-center gap-2 flex-wrap lg:flex-nowrap">
+                        class="flex items-center gap-1.5 flex-nowrap shrink-0">
 
-                        <!-- 1. MASTER FILTER TAHUN -->
-                        <div class="p-[1.5px] rounded-lg bg-gradient-to-r from-[#27B78F] to-[#12B4C9] shadow-sm">
-                            <div class="flex items-center bg-white px-2 py-1 rounded-[7px]">
-                                <i class="fa-solid fa-calendar-days text-[#27B78F] text-[11px] mr-1"></i>
-                                <select name="tahun" id="globalTahun"
-                                    onchange="document.getElementById('formGlobalFilter').submit()"
-                                    class="text-[11px] font-extrabold text-black border-0 bg-transparent focus:outline-none cursor-pointer pr-1">
-                                    @foreach ($daftarTahun as $thn)
-                                        <option value="{{ $thn }}" class="text-black font-semibold"
-                                            {{ (string) $tahunTerpilih === (string) $thn ? 'selected' : '' }}>
-                                            {{ $thn }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                        <input type="hidden" name="laporan" :value="laporanOpen ? 'true' : 'false'">
 
-                                <!-- Tombol Tambah Tahun -->
-                                <button type="button" @click="tahunModalOpen = true; inputTahunBaru = '';"
-                                    class="p-1 bg-teal-50 hover:bg-[#27B78F] text-[#27B78F] hover:text-white rounded-md transition cursor-pointer ml-1.5"
-                                    title="Tambah Tahun Liputan Baru">
-                                    <i class="fa-solid fa-plus text-[9px]"></i>
-                                </button>
+                        <!-- 1. MASTER FILTER TAHUN (Lengkap dengan Label di Atasnya) -->
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-[9px] font-semibold text-slate-900 text-center">Filter Tahun</span>
+                            <div class="p-[1.5px] rounded-lg bg-gradient-to-r from-[#27B78F] to-[#12B4C9] shadow-sm">
+                                <div class="flex items-center bg-white px-1.5 py-1 rounded-[7px]">
+                                    <i class="fa-solid fa-calendar-days text-[#27B78F] text-[10px] mr-1"></i>
+                                    <select name="tahun" id="globalTahun"
+                                        onchange="document.getElementById('formGlobalFilter').submit()"
+                                        class="text-[10px] font-extrabold text-black border-0 bg-transparent focus:outline-none cursor-pointer pr-1">
+                                        @foreach ($daftarTahun as $thn)
+                                            <option value="{{ $thn }}" class="text-black font-semibold"
+                                                {{ (string) $tahunTerpilih === (string) $thn ? 'selected' : '' }}>
+                                                {{ $thn }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+
+                                    <!-- Tombol Tambah Tahun -->
+                                    <button type="button" @click="tahunModalOpen = true; inputTahunBaru = '';"
+                                        class="p-1 bg-teal-50 hover:bg-[#27B78F] text-[#27B78F] hover:text-white rounded-md transition cursor-pointer ml-1"
+                                        title="Tambah Tahun Liputan Baru">
+                                        <i class="fa-solid fa-plus text-[8px]"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
                         <!-- GARIS PEMBATAS VERTIKAL -->
-                        <div class="h-5 w-px bg-slate-300 mx-0.5 hidden sm:block"></div>
+                        <div class="h-4 w-px bg-slate-300 mx-0.5 hidden sm:block"></div>
 
                         <!-- 2. FILTER BULAN -->
-                        <div class="flex flex-col gap-1">
-                            <span class="text-[10px] font-semibold text-slate-900 text-center ">Filter Bulan</span>
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-[9px] font-semibold text-slate-900 text-center">Filter Bulan</span>
                             <div
                                 class="p-[1.5px] rounded-lg bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200 hover:from-[#27B78F] hover:to-[#12B4C9] transition-all duration-300 shadow-sm">
-                                <div class="flex items-center bg-white px-2 py-1 rounded-[7px]">
-                                    <i class="fa-solid fa-clock text-black text-[11px] mr-1"></i>
+                                <div class="flex items-center bg-white px-1.5 py-1 rounded-[7px]">
+                                    <i class="fa-solid fa-clock text-black text-[10px] mr-1"></i>
                                     <select name="bulan" id="globalBulan"
                                         onchange="document.getElementById('formGlobalFilter').submit()"
-                                        class="text-[11px] font-bold text-black border-0 bg-transparent focus:outline-none cursor-pointer max-w-[110px] truncate">
+                                        class="text-[10px] font-bold text-black border-0 bg-transparent focus:outline-none cursor-pointer max-w-[95px] truncate">
                                         <option value="all" {{ request('bulan', 'all') == 'all' ? 'selected' : '' }}>
                                             Semua Bulan</option>
                                         @php
@@ -163,15 +185,15 @@
                         </div>
 
                         <!-- 3. FILTER TONE -->
-                        <div class="flex flex-col gap-1">
-                            <span class="text-[10px] font-semibold text-slate-900 text-center ">Filter Tone</span>
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-[9px] font-semibold text-slate-900 text-center">Filter Tone</span>
                             <div
                                 class="p-[1.5px] rounded-lg bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200 hover:from-[#27B78F] hover:to-[#12B4C9] transition-all duration-300 shadow-sm">
-                                <div class="flex items-center bg-white px-2 py-1 rounded-[7px]">
-                                    <i class="fa-solid fa-face-smile text-black text-[11px] mr-1"></i>
+                                <div class="flex items-center bg-white px-1.5 py-1 rounded-[7px]">
+                                    <i class="fa-solid fa-face-smile text-black text-[10px] mr-1"></i>
                                     <select name="tone" id="globalTone"
                                         onchange="document.getElementById('formGlobalFilter').submit()"
-                                        class="text-[11px] font-bold text-black border-0 bg-transparent focus:outline-none cursor-pointer max-w-[105px] truncate">
+                                        class="text-[10px] font-bold text-black border-0 bg-transparent focus:outline-none cursor-pointer max-w-[90px] truncate">
                                         <option value="all" {{ request('tone', 'all') == 'all' ? 'selected' : '' }}>
                                             Semua Tone</option>
                                         <option value="Positif" {{ request('tone') == 'Positif' ? 'selected' : '' }}>
@@ -187,15 +209,15 @@
                         </div>
 
                         <!-- 4. FILTER TOPIK -->
-                        <div class="flex flex-col gap-1">
-                            <span class="text-[10px] font-semibold text-slate-900 text-center ">Filter Topik</span>
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-[9px] font-semibold text-slate-900 text-center">Filter Topik</span>
                             <div
                                 class="p-[1.5px] rounded-lg bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200 hover:from-[#27B78F] hover:to-[#12B4C9] transition-all duration-300 shadow-sm">
-                                <div class="flex items-center bg-white px-2 py-1 rounded-[7px]">
-                                    <i class="fa-solid fa-tags text-black text-[11px] mr-1"></i>
+                                <div class="flex items-center bg-white px-1.5 py-1 rounded-[7px]">
+                                    <i class="fa-solid fa-tags text-black text-[10px] mr-1"></i>
                                     <select name="topik" id="globalTopik"
                                         onchange="document.getElementById('formGlobalFilter').submit()"
-                                        class="text-[11px] font-bold text-black border-0 bg-transparent focus:outline-none cursor-pointer max-w-[110px] truncate">
+                                        class="text-[10px] font-bold text-black border-0 bg-transparent focus:outline-none cursor-pointer max-w-[95px] truncate">
                                         <option value="all"
                                             {{ request('topik', 'all') == 'all' ? 'selected' : '' }}>
                                             Semua Topik</option>
@@ -214,16 +236,15 @@
                         </div>
 
                         <!-- 5. FILTER SIFAT BERITA -->
-                        <div class="flex flex-col gap-1">
-                            <span class="text-[10px] font-semibold text-slate-900 text-center ">Filter Sifat
-                                Berita</span>
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-[9px] font-semibold text-slate-900 text-center">Filter Sifat</span>
                             <div
                                 class="p-[1.5px] rounded-lg bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200 hover:from-[#27B78F] hover:to-[#12B4C9] transition-all duration-300 shadow-sm">
-                                <div class="flex items-center bg-white px-2 py-1 rounded-[7px]">
-                                    <i class="fa-solid fa-sliders text-black text-[11px] mr-1"></i>
+                                <div class="flex items-center bg-white px-1.5 py-1 rounded-[7px]">
+                                    <i class="fa-solid fa-sliders text-black text-[10px] mr-1"></i>
                                     <select name="sifat_berita" id="globalSifat"
                                         onchange="document.getElementById('formGlobalFilter').submit()"
-                                        class="text-[11px] font-bold text-black border-0 bg-transparent focus:outline-none cursor-pointer max-w-[110px] truncate">
+                                        class="text-[10px] font-bold text-black border-0 bg-transparent focus:outline-none cursor-pointer max-w-[95px] truncate">
                                         <option value="all"
                                             {{ request('sifat_berita', 'all') == 'all' ? 'selected' : '' }}>Semua Sifat
                                         </option>
@@ -239,25 +260,28 @@
                         </div>
 
                         <!-- TOMBOL RESET FILTER -->
-                        @if (request()->hasAny(['bulan', 'tone', 'topik', 'sifat_berita']) &&
+                        @if (request()->hasAny(['bulan', 'tone', 'topik', 'sifat_berita', 'laporan']) &&
                                 (request('bulan') != 'all' ||
                                     request('tone') != 'all' ||
                                     request('topik') != 'all' ||
-                                    request('sifat_berita') != 'all'))
-                            <a href="{{ route('pages.berita.index', ['tahun' => $tahunTerpilih]) }}"
-                                class="px-2.5 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-[10px] font-bold transition flex items-center gap-1 cursor-pointer shadow-sm shrink-0"
-                                title="Reset Filter">
-                                <i class="fa-solid fa-rotate-left text-[9px]"></i>
-                                <span>Reset</span>
-                            </a>
+                                    request('sifat_berita') != 'all' ||
+                                    request('laporan') == 'true'))
+                            <div class="flex flex-col justify-end">
+                                <a href="{{ route('pages.berita.index', ['tahun' => $tahunTerpilih]) }}"
+                                    class="px-2 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-[9px] font-bold transition flex items-center gap-1 cursor-pointer shadow-sm shrink-0 self-end mb-0.5"
+                                    title="Reset Filter">
+                                    <i class="fa-solid fa-rotate-left text-[8px]"></i>
+                                    <span>Reset</span>
+                                </a>
+                            </div>
                         @endif
 
                     </form>
 
                     <!-- LOGO SIARCOM DESKTOP -->
-                    <div class="hidden lg:flex items-center pl-2 border-l border-slate-200 shrink-0">
+                    <div class="hidden xl:flex items-center pl-2 border-l border-slate-200 shrink-0">
                         <img src="{{ asset('img/siarcom.png') }}" alt="Logo SIARCOM"
-                            class="h-10 w-auto object-contain">
+                            class="h-9 w-auto object-contain">
                     </div>
 
                 </div>
@@ -299,6 +323,13 @@
                     @include('pages.berita.partials.table')
                 </div>
 
+                <!-- SECTION LAPORAN MEDMON (TOGGLE) -->
+                <div x-show="laporanOpen" x-cloak
+                    class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4">
+                    <div class="w-full max-w-6xl max-h-[90vh] overflow-y-auto berita-scrollbar">
+                        @include('pages.berita.partials.laporan')
+                    </div>
+                </div>
 
             </main>
         </div>

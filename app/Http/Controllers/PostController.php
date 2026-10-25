@@ -151,22 +151,20 @@ class PostController extends Controller
         $cards->total_shared    = (clone $baseCardsQuery)->where('kategori_konten', 'Shared Content')->count();
 
         // ========================================================
-        // 5. ANALISIS INTERAKSI TERTINGGI & TERENDAH
-        // ========================================================
-        $queryInteraksi = clone $baseCardsQuery;
+// 5. ANALISIS INTERAKSI TERTINGGI & TERENDAH
+// ========================================================
+$queryInteraksi = clone $baseCardsQuery;
 
-        $interaksiTertinggi = (clone $queryInteraksi)
-            ->select('topik', 'likes', 'comments', 'view', 'share', 'retweet', DB::raw("$rumusInteraksiLengkap as total_skor"))
-            ->orderBy('total_skor', 'desc')
-            ->limit(5)
-            ->get();
+$semuaInteraksi = (clone $queryInteraksi)
+    ->select('topik', 'likes', 'comments', 'view', 'share', 'retweet', DB::raw("$rumusInteraksiLengkap as total_skor"))
+    ->orderBy('total_skor', 'desc')
+    ->get();
 
-        $interaksiTerendah = (clone $queryInteraksi)
-            ->select('topik', 'likes', 'comments', 'view', 'share', 'retweet', DB::raw("$rumusInteraksiLengkap as total_skor"))
-            ->orderBy('total_skor', 'asc')
-            ->limit(5)
-            ->get();
+// 5 teratas
+$interaksiTertinggi = $semuaInteraksi->take(5)->values();
 
+//5 terbawah
+$interaksiTerendah = $semuaInteraksi->slice(5)->reverse()->take(5)->values();
         // ========================================================
         // 6. TREN POSTINGAN BULANAN (Merespons Tahun, Kategori, & Tipe)
         // ========================================================
@@ -707,9 +705,42 @@ class PostController extends Controller
     /**
      * EXPORT DATA KE EXCEL
      */
-    public function exportExcel(Request $request) 
+       public function exportExcel(Request $request)
 {
     $export = new PostExport($request);
-    return Excel::download($export, $export->getFilename());
+
+    $baris = $export->collection()
+        ->map(fn ($post) => $export->map($post));
+
+    $jumlah = $baris->count();
+
+    if ($request->boolean('header')) {
+        $baris->prepend($export->headings());
+    }
+
+    $tsv = $baris
+        ->map(fn ($kolom) => collect($kolom)
+            ->slice(1) // buang kolom NO
+            ->map(fn ($nilai) => $this->selSpreadsheet($nilai))
+            ->implode("\t"))
+        ->implode("\n");
+
+    return response()->json([
+        'success' => true,
+        'jumlah'  => $jumlah,
+        'tsv'     => $tsv,
+    ]);
 }
+ 
+    private function selSpreadsheet(int $nilai): string
+    {
+        $teks = str_replace(["\r\n", "\r"], "\n", (string) ($nilai ?? ''));
+ 
+        if (preg_match('/[\t\n"]/', $teks)) {
+            return '"' . str_replace('"', '""', $teks) . '"';
+        }
+ 
+        return $teks;
+    }
+
 }

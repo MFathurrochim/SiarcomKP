@@ -219,7 +219,7 @@
 
         // Ambil dari URL jika ada, jika tidak gunakan previousMonth & currentMonth yang dinamis
         const initialBulanKiri = urlParams.has('bulan_kiri') ? parseInt(urlParams.get('bulan_kiri')) - 1 :
-        previousMonth;
+            previousMonth;
         const initialBulanKanan = urlParams.has('bulan_kanan') ? parseInt(urlParams.get('bulan_kanan')) - 1 :
             currentMonth;
 

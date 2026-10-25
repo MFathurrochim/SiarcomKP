@@ -12,7 +12,7 @@ use Maatwebsite\Excel\Facades\Excel;
 class BeritaController extends Controller
 {
     /**
-     * Controller Berita
+     * Helper Method: Terapkan Global Filter ke Query
      */
     private function applyGlobalFilters($query, Request $request)
     {
@@ -500,18 +500,18 @@ public function apiPemberitaan(Request $request)
      */
    public function update(Request $request, int $id)
     {
-        $validated = $request->validate([
-            'tanggal'          => 'required|date',
-            'link_berita'      => 'nullable|url|max:255',
-            'tone'             => 'required|in:Positif,Netral,Negatif',
-            'judul'            => 'required|string|max:255',
-            'nama_media'       => 'required|string|max:255',
-            'reporter'         => 'required|string|max:255',
-            'spokeperson'      => 'required|string|max:255',
-            'spokeperson_role' => 'required|string|max:255',
-            'topik'            => 'required|in:Operasi,CSR,Inovasi,Apresiasi',
-            'sifat_berita'     => 'required|in:Internal,Eksternal',
-        ]);
+      $validated = $request->validate([
+    'tanggal'          => 'required|date',
+    'link_berita'      => 'nullable|url|max:255',
+    'tone'             => 'required|in:Positif,Netral,Negatif',
+    'judul'            => 'required|string|max:255',
+    'nama_media'       => 'required|string|max:50',
+    'reporter'         => 'nullable|string|max:50',
+    'spokeperson'      => 'nullable|string|max:50',
+    'spokeperson_role' => 'nullable|string|max:50',
+    'topik'            => 'required|in:Operasi,CSR,Inovasi,Apresiasi',
+    'sifat_berita'     => 'required|in:Internal,Eksternal',
+]);
 
         try {
             DB::beginTransaction();
@@ -668,9 +668,43 @@ public function apiPemberitaan(Request $request)
     /**
      * Export Excel
      */
-    public function exportExcel(Request $request) 
+       public function exportExcel(Request $request)
 {
     $export = new BeritaExport($request);
-    return Excel::download($export, $export->getFilename());
+
+    $baris = $export->collection()
+        ->map(fn ($berita) => $export->map($berita));
+
+    $jumlah = $baris->count();
+
+    if ($request->boolean('header')) {
+        // buang heading 'no' juga, biar jumlah kolom tetap sama dengan data
+        $baris->prepend(array_slice($export->headings(), 1));
+    }
+
+    $tsv = $baris
+        ->map(fn ($kolom) => collect($kolom)
+            ->slice(1) // buang kolom pertama (nomor urut)
+            ->map(fn ($nilai) => $this->selSpreadsheet($nilai))
+            ->implode("\t"))
+        ->implode("\n");
+
+    return response()->json([
+        'success' => true,
+        'jumlah'  => $jumlah,
+        'tsv'     => $tsv,
+    ]);
 }
+
+    private function selSpreadsheet($nilai): string
+    {
+        $teks = str_replace(["\r\n", "\r"], "\n", (string) ($nilai ?? ''));
+ 
+        if (preg_match('/[\t\n"]/', $teks)) {
+            return '"' . str_replace('"', '""', $teks) . '"';
+        }
+ 
+        return $teks;
+    }
+
 }

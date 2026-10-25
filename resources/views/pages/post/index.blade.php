@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SIARCOM - Dashboard Sosial Media</title>
+    <title>SIARCOM - Dashboard Monitoring Sosial Media</title>
 
     <!-- Tailwind v4 & FontAwesome -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
@@ -55,6 +55,7 @@
         inputTahunBaru: '',
         editModalHtml: '',
         loadingEdit: false,
+        laporanOpen: false,
     
         // Fungsi untuk mengaplikasikan tahun baru ke URL
         submitTahunBaru() {
@@ -100,9 +101,9 @@
 
             <!-- TOP NAVBAR ULTRA CLEAN & COMPACT -->
             <header
-                class="min-h-[64px] bg-white border-b border-slate-200/80 px-4 py-2 sm:px-6 z-20 shrink-0 relative shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-2">
+                class="min-h-[64px] bg-white border-b border-slate-200/80 px-4 py-2 sm:px-6 z-20 shrink-0 relative shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-2">
 
-                <!-- SISI KIRI: JUDUL DASHBOARD & LOGO SIARCOM MOBILE -->
+                <!-- SISI KIRI: JUDUL DASHBOARD, TOMBOL LAPORAN & LOGO SIARCOM -->
                 <div class="flex items-center justify-between shrink-0 gap-3">
                     <div class="flex items-center gap-2.5">
                         <div class="p-1.5 bg-teal-50 rounded-lg border border-teal-100/80 text-[#27B78F]">
@@ -115,54 +116,65 @@
                         </div>
                     </div>
 
+                    <!-- TOMBOL LAPORAN (DI SEBELAH KIRI / DEKAT JUDUL) -->
+                    <button type="button" @click="laporanOpen = true"
+                        class="px-3 py-1.5 rounded-xl text-[11px] font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer bg-gradient-to-r from-[#27B78F] to-[#12B4C9] hover:opacity-90 text-white shrink-0 ml-2">
+                        <i class="fa-solid fa-file-lines"></i>
+                        <span>Laporan</span>
+                    </button>
+
                     <!-- Logo SIARCOM Layar Kecil -->
                     <img src="{{ asset('img/siarcom.png') }}" alt="Logo SIARCOM"
-                        class="h-9 w-auto object-contain lg:hidden">
+                        class="h-8 w-auto object-contain xl:hidden">
                 </div>
 
                 <!-- SISI KANAN: GLOBAL FILTER BAR COMPACT + LOGO DESKTOP -->
-                <div class="flex items-center justify-between lg:justify-end gap-3 flex-1 min-w-0">
+                <div
+                    class="flex items-center justify-between xl:justify-end gap-2 flex-1 min-w-0 overflow-x-auto sosmed-scrollbar pb-1 xl:pb-0">
 
                     <form id="formGlobalFilter" method="GET" action="{{ route('pages.post.index') }}"
-                        class="flex items-center gap-2 flex-wrap lg:flex-nowrap">
+                        class="flex items-center gap-1.5 flex-nowrap shrink-0">
 
-                        <!-- 1. MASTER FILTER TAHUN (GRADIEN BORDER KHAS SIARCOM, BG PUTIH, TEKS HITAM) -->
-                        <div class="p-[1.5px] rounded-lg bg-gradient-to-r from-[#27B78F] to-[#12B4C9] shadow-sm">
-                            <div class="flex items-center bg-white px-2 py-1 rounded-[7px]">
-                                <i class="fa-solid fa-calendar-days text-[#27B78F] text-[11px] mr-1"></i>
-                                <select name="tahun" id="globalTahun"
-                                    onchange="document.getElementById('formGlobalFilter').submit()"
-                                    class="text-[11px] font-extrabold text-black border-0 bg-transparent focus:outline-none cursor-pointer pr-1">
-                                    @foreach ($daftarTahun as $thn)
-                                        <option value="{{ $thn }}" class="text-black font-semibold"
-                                            {{ (string) $tahunTerpilih === (string) $thn ? 'selected' : '' }}>
-                                            {{ $thn }}
-                                        </option>
-                                    @endforeach
-                                </select>
+                        <!-- 1. MASTER FILTER TAHUN (Lengkap dengan Label di Atasnya) -->
+                        <div class="flex flex-col gap-0.5">
+                            <span class="text-[9px] font-semibold text-slate-900 text-center">Filter Tahun</span>
+                            <div class="p-[1.5px] rounded-lg bg-gradient-to-r from-[#27B78F] to-[#12B4C9] shadow-sm">
+                                <div class="flex items-center bg-white px-1.5 py-1 rounded-[7px]">
+                                    <i class="fa-solid fa-calendar-days text-[#27B78F] text-[10px] mr-1"></i>
+                                    <select name="tahun" id="globalTahun"
+                                        onchange="document.getElementById('formGlobalFilter').submit()"
+                                        class="text-[10px] font-extrabold text-black border-0 bg-transparent focus:outline-none cursor-pointer pr-1">
+                                        @foreach ($daftarTahun as $thn)
+                                            <option value="{{ $thn }}" class="text-black font-semibold"
+                                                {{ (string) $tahunTerpilih === (string) $thn ? 'selected' : '' }}>
+                                                {{ $thn }}
+                                            </option>
+                                        @endforeach
+                                    </select>
 
-                                <!-- Tombol Tambah Tahun -->
-                                <button type="button" @click="tahunModalOpen = true; inputTahunBaru = '';"
-                                    class="p-1 bg-teal-50 hover:bg-[#27B78F] text-[#27B78F] hover:text-white rounded-md transition cursor-pointer ml-1.5"
-                                    title="Tambah Tahun Postingan Baru">
-                                    <i class="fa-solid fa-plus text-[9px]"></i>
-                                </button>
+                                    <!-- Tombol Tambah Tahun -->
+                                    <button type="button" @click="tahunModalOpen = true; inputTahunBaru = '';"
+                                        class="p-1 bg-teal-50 hover:bg-[#27B78F] text-[#27B78F] hover:text-white rounded-md transition cursor-pointer ml-1"
+                                        title="Tambah Tahun Postingan Baru">
+                                        <i class="fa-solid fa-plus text-[8px]"></i>
+                                    </button>
+                                </div>
                             </div>
                         </div>
 
                         <!-- GARIS PEMBATAS VERTIKAL -->
-                        <div class="h-5 w-px bg-slate-300 mx-0.5 hidden sm:block"></div>
+                        <div class="h-4 w-px bg-slate-300 mx-0.5 hidden sm:block"></div>
 
                         <!-- 2. FILTER BULAN -->
-                        <div class="flex flex-col gap-1">
+                        <div class="flex flex-col gap-0.5">
                             <span class="text-[9px] font-semibold text-slate-900 text-center">Filter Bulan</span>
                             <div
                                 class="p-[1.5px] rounded-lg bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200 hover:from-[#27B78F] hover:to-[#12B4C9] transition-all duration-300 shadow-sm">
-                                <div class="flex items-center bg-white px-2 py-1 rounded-[7px]">
-                                    <i class="fa-solid fa-clock text-black text-[11px] mr-1"></i>
+                                <div class="flex items-center bg-white px-1.5 py-1 rounded-[7px]">
+                                    <i class="fa-solid fa-clock text-black text-[10px] mr-1"></i>
                                     <select name="bulan_sosmed" id="globalBulan"
                                         onchange="document.getElementById('formGlobalFilter').submit()"
-                                        class="text-[11px] font-bold text-black border-0 bg-transparent focus:outline-none cursor-pointer max-w-[110px] truncate">
+                                        class="text-[10px] font-bold text-black border-0 bg-transparent focus:outline-none cursor-pointer max-w-[95px] truncate">
 
                                         <option value="all"
                                             {{ request('bulan_sosmed', 'all') == 'all' ? 'selected' : '' }}>
@@ -197,17 +209,16 @@
                         </div>
 
                         <!-- 3. FILTER TIPE KONTEN -->
-                        <div class="flex flex-col gap-1">
+                        <div class="flex flex-col gap-0.5">
                             <span class="text-[9px] font-semibold text-slate-900 text-center">Filter Tipe</span>
                             <div
                                 class="p-[1.5px] rounded-lg bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200 hover:from-[#27B78F] hover:to-[#12B4C9] transition-all duration-300 shadow-sm">
-                                <div class="flex items-center bg-white px-2 py-1 rounded-[7px]">
-                                    <i class="fa-solid fa-photo-film text-black text-[11px] mr-1"></i>
+                                <div class="flex items-center bg-white px-1.5 py-1 rounded-[7px]">
+                                    <i class="fa-solid fa-photo-film text-black text-[10px] mr-1"></i>
                                     <select name="tipe_konten" id="globalTipe"
                                         onchange="document.getElementById('formGlobalFilter').submit()"
-                                        class="text-[11px] font-bold text-black border-0 bg-transparent focus:outline-none cursor-pointer max-w-[120px] truncate">
+                                        class="text-[10px] font-bold text-black border-0 bg-transparent focus:outline-none cursor-pointer max-w-[100px] truncate">
                                         <option value="">Semua Tipe</option>
-                                        <!-- Nilai disesuaikan persis dengan ENUM tipe_konten di database: 'Feed/Reels', 'Story' -->
                                         @php
                                             $listTipeKonten = ['Feed/Reels', 'Story'];
                                         @endphp
@@ -223,17 +234,16 @@
                         </div>
 
                         <!-- 4. FILTER KATEGORI KONTEN -->
-                        <div class="flex flex-col gap-1">
+                        <div class="flex flex-col gap-0.5">
                             <span class="text-[9px] font-semibold text-slate-900 text-center">Filter Kategori</span>
                             <div
                                 class="p-[1.5px] rounded-lg bg-gradient-to-r from-slate-200 via-slate-300 to-slate-200 hover:from-[#27B78F] hover:to-[#12B4C9] transition-all duration-300 shadow-sm">
-                                <div class="flex items-center bg-white px-2 py-1 rounded-[7px]">
-                                    <i class="fa-solid fa-tags text-black text-[11px] mr-1"></i>
+                                <div class="flex items-center bg-white px-1.5 py-1 rounded-[7px]">
+                                    <i class="fa-solid fa-tags text-black text-[10px] mr-1"></i>
                                     <select name="kategori_konten" id="globalKategori"
                                         onchange="document.getElementById('formGlobalFilter').submit()"
-                                        class="text-[11px] font-bold text-black border-0 bg-transparent focus:outline-none cursor-pointer max-w-[140px] truncate">
+                                        class="text-[10px] font-bold text-black border-0 bg-transparent focus:outline-none cursor-pointer max-w-[110px] truncate">
                                         <option value="">Semua Kategori</option>
-                                        <!-- Nilai disesuaikan persis dengan ENUM kategori_konten di database: 'Collab Content', 'Owned Production', 'Shared Content' -->
                                         @php
                                             $listKategoriKonten = [
                                                 'Collab Content',
@@ -256,9 +266,9 @@
                         @if (request()->hasAny(['bulan_sosmed', 'tipe_konten', 'kategori_konten']))
                             <div class="flex flex-col justify-end">
                                 <a href="{{ route('pages.post.index', ['tahun' => $tahunTerpilih]) }}"
-                                    class="px-2.5 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-[10px] font-bold transition flex items-center gap-1 cursor-pointer shadow-sm shrink-0"
+                                    class="px-2 py-1.5 bg-rose-500 hover:bg-rose-600 text-white rounded-lg text-[9px] font-bold transition flex items-center gap-1 cursor-pointer shadow-sm shrink-0 self-end mb-0.5"
                                     title="Reset Filter">
-                                    <i class="fa-solid fa-rotate-left text-[9px]"></i>
+                                    <i class="fa-solid fa-rotate-left text-[8px]"></i>
                                     <span>Reset</span>
                                 </a>
                             </div>
@@ -267,9 +277,8 @@
                     </form>
 
                     <!-- LOGO SIARCOM DESKTOP -->
-                    <div class="hidden lg:flex items-center pl-2 border-l border-slate-200 shrink-0">
-                        <img src="{{ asset('img/siarcom.png') }}" alt="Logo SIARCOM"
-                            class="h-10 w-auto object-contain">
+                    <div class="hidden xl:flex items-center pl-2 border-l border-slate-200 shrink-0">
+                        <img src="{{ asset('img/siarcom.png') }}" alt="Logo SIARCOM" class="h-9 w-auto object-contain">
                     </div>
 
                 </div>
@@ -343,6 +352,16 @@
                 <!-- Render HTML Edit secara dinamis dari Controller -->
                 <div x-show="!loadingEdit" x-html="editModalHtml"></div>
             </div>
+        </div>
+
+        <!-- Modal Laporan Sosial Media -->
+        <div x-show="laporanOpen" x-cloak
+            class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4">
+
+            <div class="w-full max-w-6xl max-h-[90vh] overflow-y-auto sosmed-scrollbar">
+                @include('pages.post.partials.laporan')
+            </div>
+
         </div>
 
         <!-- Modal Kustom Tambah Tahun Sosmed -->
