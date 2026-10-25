@@ -732,10 +732,9 @@ $interaksiTerendah = $semuaInteraksi->slice(5)->reverse()->take(5)->values();
     ]);
 }
  
-    private function selSpreadsheet(int $nilai): string
-    {
-        $teks = str_replace(["\r\n", "\r"], "\n", (string) ($nilai ?? ''));
- 
+    private function selSpreadsheet(mixed $nilai): string
+{
+    $teks = str_replace(["\r\n", "\r"], "\n", (string) ($nilai ?? ''));
         if (preg_match('/[\t\n"]/', $teks)) {
             return '"' . str_replace('"', '""', $teks) . '"';
         }

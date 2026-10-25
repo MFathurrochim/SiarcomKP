@@ -5,7 +5,6 @@
             <h2 class="text-base font-bold text-black whitespace-nowrap">Daftar Berita</h2>
         </div>
 
-
         <!-- Form Filter Cari & Buttons -->
         <div class="flex flex-wrap items-center gap-2">
             <!-- Input Pencarian Utama -->
@@ -29,11 +28,13 @@
                 <i class="fa-solid fa-file-excel"></i> Paste Spreadsheet
             </button>
 
-            <!-- Tombol Unduh Laporan Excel -->
-            <a href="{{ route('berita.export', request()->query()) }}"
-                class="inline-flex items-center gap-1 text-xs font-bold text-black bg-white border border-black rounded-xl px-2.5 py-1.5 hover:bg-slate-50 transition shadow-xxs cursor-pointer">
-                <i class="fa-solid fa-download text-black"></i> Unduh
-            </a>
+            <!-- Tombol Salin Tabel -->
+            <button type="button" onclick="salinTabelBerita(this)"
+                data-url="{{ route('berita.export', request()->query()) }}"
+                class="inline-flex items-center gap-1 text-xs font-bold text-black bg-white border border-black rounded-xl px-2.5 py-1.5 hover:bg-slate-50 transition shadow-xxs cursor-pointer disabled:opacity-60">
+                <i class="fa-solid fa-copy text-black"></i>
+                <span>Salin</span>
+            </button>
 
             <!-- Tombol Reset Filter / Search -->
             <a href="{{ route('pages.berita.index', ['tahun' => $tahunTerpilih]) }}"
@@ -567,16 +568,20 @@
                 const currentSortOrder = "{{ request('sort_order', 'desc') }}";
 
                 let newOrder = 'asc';
+
                 if (currentSortBy === column && currentSortOrder === 'asc') {
                     newOrder = 'desc';
                 }
 
-                const form = document.getElementById('searchFormBerita');
+                const form = document.getElementById('filterTableForm');
 
+                // Ubah nilai sorting
                 form.querySelector('input[name="sort_by"]').value = column;
                 form.querySelector('input[name="sort_order"]').value = newOrder;
 
-                window.location.href = `${form.action}?${new URLSearchParams(new FormData(form)).toString()}`;
+                const params = new URLSearchParams(new FormData(form));
+
+                window.location.href = `${form.action}?${params.toString()}`;
             }
 
             /**
@@ -919,11 +924,18 @@
                     function triggerSearchBerita() {
                         filterForm.querySelector('input[name="search"]').value = inputSearch.value;
 
-                        const formData = new FormData(filterForm);
-                        const params = new URLSearchParams(formData);
-                        const targetUrl = filterForm.action;
-                        const fullUrl = `${targetUrl}?${params.toString()}`;
+                        const allowed = ['tahun', 'bulan', 'tone', 'topik', 'sifat_berita', 'status_publikasi',
+                            'search', 'sort_by', 'sort_order'
+                        ];
+                        const params = new URLSearchParams();
 
+                        allowed.forEach(name => {
+                            filterForm.querySelectorAll(`[name="${name}"]`).forEach(el => {
+                                if (el.value !== '') params.set(name, el.value);
+                            });
+                        });
+
+                        const fullUrl = `${filterForm.action}?${params.toString()}`;
                         fetch(fullUrl, {
                                 method: 'GET',
                                 headers: {
@@ -980,4 +992,108 @@
                     });
                 });
             });
+        </script>
+
+        <!-- JAVASCRIPT SALIN TABEL BERITA -->
+        <script>
+            async function salinTabelBerita(tombol) {
+
+                // cegah klik ganda saat proses berjalan
+                if (tombol.dataset.loading === '1') {
+                    return;
+                }
+
+                const label = tombol.querySelector('span');
+                const teksAwal = label ? label.textContent : '';
+
+                tombol.dataset.loading = '1';
+                tombol.disabled = true;
+
+                if (label) {
+                    label.textContent = 'Menyalin...';
+                }
+
+                try {
+
+                    const response = await fetch(tombol.dataset.url, {
+                        cache: 'no-store',
+                        headers: {
+                            'Accept': 'application/json',
+                            'X-Requested-With': 'XMLHttpRequest'
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error('Gagal mengambil data tabel.');
+                    }
+
+                    const hasil = await response.json();
+
+                    if (!hasil.jumlah) {
+                        tampilToastSalinBerita('Tidak ada data untuk disalin.', false);
+                        return;
+                    }
+
+                    await salinKeClipboardBerita(hasil.tsv);
+
+                    tampilToastSalinBerita(`${hasil.jumlah} baris disalin. Tinggal paste (Ctrl+V) di spreadsheet.`);
+
+                } catch (error) {
+
+                    console.error('Error Salin Tabel Berita:', error);
+
+                    tampilToastSalinBerita(error.message || 'Gagal menyalin tabel.', false);
+
+                } finally {
+
+                    tombol.dataset.loading = '0';
+                    tombol.disabled = false;
+
+                    if (label) {
+                        label.textContent = teksAwal;
+                    }
+
+                }
+            }
+
+            async function salinKeClipboardBerita(teks) {
+
+                if (navigator.clipboard && window.isSecureContext) {
+                    await navigator.clipboard.writeText(teks);
+                    return;
+                }
+
+                const area = document.createElement('textarea');
+
+                area.value = teks;
+                area.style.position = 'fixed';
+                area.style.opacity = '0';
+
+                document.body.appendChild(area);
+                area.focus();
+                area.select();
+
+                const berhasil = document.execCommand('copy');
+
+                document.body.removeChild(area);
+
+                if (!berhasil) {
+                    throw new Error('Browser menolak menyalin ke clipboard.');
+                }
+            }
+
+            function tampilToastSalinBerita(pesan, sukses = true) {
+
+                const toast = document.createElement('div');
+
+                toast.className =
+                    'fixed bottom-6 right-6 z-[200] max-w-xs px-4 py-3 rounded-xl shadow-2xl text-xs font-bold text-white ' +
+                    (sukses ? 'bg-teal-600' : 'bg-rose-600');
+
+                toast.textContent = pesan;
+
+                document.body.appendChild(toast);
+
+                setTimeout(() => toast.remove(), 3500);
+            }
         </script>

@@ -7,6 +7,8 @@ use App\Http\Controllers\ActivityLogController;
 use App\Http\Controllers\BeritaController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\MedmonController;
+use App\Http\Controllers\SosmedController;
 
 // 1. GUEST ROUTES
 Route::get('/', function () {
@@ -80,7 +82,7 @@ Route::middleware('auth')->group(function () {
     Route::put('/branch-comm/media-monitoring/update/{id}', [BeritaController::class, 'update'])->name('pages.berita.update');
     Route::delete('/branch-comm/media-monitoring/delete/{id}', [BeritaController::class, 'destroy'])->name('pages.berita.destroy');
     Route::patch('/berita/{id}/inline-update', [BeritaController::class, 'inlineUpdate'])->name('berita.inline-update');
-    
+   
 
     // Partial Edit Modal AJAX & Legacy Berita
     Route::get('/branch-comm/media-monitoring/edit-modal/{id}', [BeritaController::class, 'editModal'])->name('pages.berita.partials.edit');
@@ -96,6 +98,7 @@ Route::middleware('auth')->group(function () {
     Route::post('/berita/tambah-tahun', [BeritaController::class, 'tambahTahun'])->name('pages.berita.tambah-tahun');
     Route::get('/berita/export-excel', [BeritaController::class, 'exportExcel'])->name('berita.export'); 
     Route::post('/berita/store-paste', [BeritaController::class, 'storePaste'])->name('berita.store-paste');
+
 
     // ========================================================
     // KHUSUS DEPT HEAD

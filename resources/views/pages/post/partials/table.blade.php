@@ -32,11 +32,13 @@
                 <i class="fa-solid fa-file-excel"></i> Paste Spreadsheet
             </button>
 
-            <!-- Tombol Unduh Laporan Excel -->
-            <a href="{{ route('post.export', array_merge(request()->query())) }}"
-                class="inline-flex items-center gap-1 text-xs font-bold text-black bg-white border border-black rounded-xl px-3 py-1.5 hover:bg-slate-50 transition shadow-xxs cursor-pointer">
-                <i class="fa-solid fa-download text-black"></i> Unduh
-            </a>
+
+            <!-- Tombol Salin Data -->
+            <button type="button" onclick="salinTabelPost(this)" data-base="{{ route('post.export') }}"
+                class="inline-flex items-center gap-1 text-xs font-bold text-black bg-white border border-black rounded-xl px-3 py-1.5 hover:bg-slate-50 transition shadow-xxs cursor-pointer disabled:opacity-60">
+                <i class="fa-solid fa-copy text-black"></i>
+                <span>Salin data</span>
+            </button>
 
             <!-- Tombol Reset Filter -->
             <a href="{{ route('pages.post.index', ['tahun' => $tahunTerpilih]) }}"
@@ -942,4 +944,87 @@
             });
         }
     });
+</script>
+
+<script>
+    // --- Logika Salin Tabel Postingan ke Clipboard ---
+    async function salinTabelPost(tombol) {
+        if (tombol.dataset.loading === '1') return;
+
+        const label = tombol.querySelector('span');
+        const teksAwal = label.textContent;
+
+        tombol.dataset.loading = '1';
+        tombol.disabled = true;
+        label.textContent = 'Menyalin...';
+
+        try {
+            // filter dibaca saat diklik supaya hasil pencarian live ikut terbawa
+            const form = document.getElementById('filterTableForm');
+            const params = new URLSearchParams(form ? new FormData(form) : undefined);
+            const inputSearch = document.getElementById('inputSearchPost');
+
+            if (inputSearch) params.set('search', inputSearch.value);
+
+            const response = await fetch(`${tombol.dataset.base}?${params}`, {
+                cache: 'no-store',
+                headers: {
+                    'Accept': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            });
+
+            if (!response.ok) throw new Error('Gagal mengambil data tabel.');
+
+            const hasil = await response.json();
+
+            if (!hasil.jumlah) {
+                toastSalinPost('Tidak ada data untuk disalin.', false);
+                return;
+            }
+
+            await tulisClipboardPost(hasil.tsv);
+            toastSalinPost(`${hasil.jumlah} baris disalin. Tinggal paste di spreadsheet.`);
+
+        } catch (error) {
+            console.error('Salin tabel post:', error);
+            toastSalinPost(error.message || 'Gagal menyalin tabel.', false);
+
+        } finally {
+            tombol.dataset.loading = '0';
+            tombol.disabled = false;
+            label.textContent = teksAwal;
+        }
+    }
+
+    async function tulisClipboardPost(teks) {
+        if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(teks);
+            return;
+        }
+
+        // fallback untuk halaman non-https
+        const area = document.createElement('textarea');
+        area.value = teks;
+        area.style.cssText = 'position:fixed;opacity:0';
+        document.body.appendChild(area);
+        area.select();
+
+        const berhasil = document.execCommand('copy');
+        area.remove();
+
+        if (!berhasil) throw new Error('Browser menolak menyalin ke clipboard.');
+    }
+
+    function toastSalinPost(pesan, sukses = true) {
+        const toast = document.createElement('div');
+
+        toast.className =
+            'fixed bottom-6 right-6 z-[200] max-w-xs px-4 py-3 rounded-xl shadow-2xl text-xs font-bold text-white ' +
+            (sukses ? 'bg-teal-600' : 'bg-rose-600');
+        toast.textContent = pesan;
+
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 3500);
+    }
 </script>
