@@ -53,7 +53,6 @@
         editModalOpen: false,
         tahunModalOpen: false,
         pasteModalOpen: false,
-        laporanOpen: {{ request('laporan') == 'true' || session('laporanOpen') ? 'true' : 'false' }},
         inputTahunBaru: '',
         activeEditId: null,
         submitTahunBaru() {
@@ -73,7 +72,7 @@
             <header
                 class="min-h-[64px] bg-white border-b border-slate-200/80 px-3 py-2 sm:px-5 z-20 shrink-0 relative shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-2">
 
-                <!-- SISI KIRI: JUDUL DASHBOARD, TOMBOL LAPORAN & LOGO MOBILE -->
+                <!-- SISI KIRI: JUDUL DASHBOARD -->
                 <div class="flex items-center justify-between shrink-0 gap-3">
                     <div class="flex items-center gap-2">
                         <div class="p-1.5 bg-teal-50 rounded-lg border border-teal-100/80 text-[#27B78F]">
@@ -86,20 +85,6 @@
                         </div>
                     </div>
 
-                    <!-- TOMBOL TOGGLE LAPORAN DI HEADER (SEBELAH JUDUL - BERLAKU SEMUA UKURAN LAYAR) -->
-                    <button type="button"
-                        @click="
-                        console.log('KLIK LAPORAN');
-                        console.log('SEBELUM:', laporanOpen);
-                        laporanOpen = !laporanOpen;
-                        console.log('SESUDAH:', laporanOpen);
-                    "
-                        class="px-3.5 py-1.5 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer bg-gradient-to-r from-[#27B78F] to-[#12B4C9] hover:opacity-90 text-white shrink-0 ml-2">
-
-                        <i class="fa-solid fa-file-lines"></i>
-                        <span>Laporan</span>
-
-                    </button>
 
                     <!-- Logo SIARCOM Mobile -->
                     <img src="{{ asset('img/siarcom.png') }}" alt="Logo SIARCOM"
@@ -112,8 +97,6 @@
 
                     <form id="formGlobalFilter" method="GET" action="{{ route('pages.berita.index') }}"
                         class="flex items-center gap-1.5 flex-nowrap shrink-0">
-
-                        <input type="hidden" name="laporan" :value="laporanOpen ? 'true' : 'false'">
 
                         <!-- 1. MASTER FILTER TAHUN (Lengkap dengan Label di Atasnya) -->
                         <div class="flex flex-col gap-0.5">
@@ -260,7 +243,7 @@
                         </div>
 
                         <!-- TOMBOL RESET FILTER -->
-                        @if (request()->hasAny(['bulan', 'tone', 'topik', 'sifat_berita', 'laporan']) &&
+                        @if (request()->hasAny(['bulan', 'tone', 'topik', 'sifat_berita']) &&
                                 (request('bulan') != 'all' ||
                                     request('tone') != 'all' ||
                                     request('topik') != 'all' ||
@@ -321,14 +304,6 @@
                 <!-- SECTION 2: Tabel Utama Data Berita, Filter, Search & Delete Overlay -->
                 <div class="w-full">
                     @include('pages.berita.partials.table')
-                </div>
-
-                <!-- SECTION LAPORAN MEDMON (TOGGLE) -->
-                <div x-show="laporanOpen" x-cloak
-                    class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4">
-                    <div class="w-full max-w-6xl max-h-[90vh] overflow-y-auto berita-scrollbar">
-                        @include('pages.berita.partials.laporan')
-                    </div>
                 </div>
 
             </main>

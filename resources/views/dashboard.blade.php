@@ -171,13 +171,13 @@
                                     </div>
                                 </div>
 
-                                <div class="flex flex-wrap items-center gap-2 mt-2">
+                                <div class="flex flex-wrap items-center gap-1.5 mt-1">
                                     <!-- Filter: Tahun -->
                                     <div
-                                        class="flex items-center gap-1.5 bg-gray-50 border border-gray-900 rounded-lg px-2.5 py-1 shadow-sm">
-                                        <label class="text-[10px] font-bold text-black uppercase">Tahun:</label>
+                                        class="flex items-center gap-1 bg-gray-50 border border-gray-900 rounded-md px-1.5 py-0.5 shadow-2xs">
+                                        <label class="text-[9px] font-bold text-black uppercase">Tahun:</label>
                                         <select name="tahun" onchange="submitFilter('filterForm')"
-                                            class="bg-transparent text-xs font-bold text-black outline-none cursor-pointer">
+                                            class="bg-transparent text-[11px] font-bold text-black outline-none cursor-pointer">
                                             @foreach ($daftarTahun ?? [] as $t)
                                                 <option value="{{ $t }}"
                                                     {{ ($tahunTerpilih ?? '') == $t ? 'selected' : '' }}>
@@ -187,37 +187,37 @@
                                         </select>
                                     </div>
 
-                                    <!-- Filter: Pilar CSR (pakai nama pilar, bukan id_pilar karena beda tiap tahun) -->
+                                    <!-- Filter: Pilar CSR -->
                                     <div
-                                        class="flex items-center gap-1.5 bg-gray-50 border border-gray-900 rounded-lg px-2.5 py-1 shadow-sm">
-                                        <label class="text-[10px] font-bold text-black uppercase">Pilar:</label>
+                                        class="flex items-center gap-1 bg-gray-50 border border-gray-900 rounded-md px-1.5 py-0.5 shadow-2xs">
+                                        <label class="text-[9px] font-bold text-black uppercase">Pilar:</label>
                                         <select name="g_pilar" onchange="submitFilter('filterForm')"
-                                            class="bg-transparent text-xs font-bold text-black outline-none cursor-pointer">
+                                            class="bg-transparent text-[11px] font-bold text-black outline-none cursor-pointer">
                                             <option value="all"
                                                 {{ ($pilarFilter ?? 'all') == 'all' ? 'selected' : '' }}>
                                                 Semua Pilar
                                             </option>
                                             <option value="Sosial"
                                                 {{ ($pilarFilter ?? '') == 'Sosial' ? 'selected' : '' }}>
-                                                Pilar Sosial
+                                                Sosial
                                             </option>
                                             <option value="Ekonomi"
                                                 {{ ($pilarFilter ?? '') == 'Ekonomi' ? 'selected' : '' }}>
-                                                Pilar Ekonomi
+                                                Ekonomi
                                             </option>
                                             <option value="Lingkungan"
                                                 {{ ($pilarFilter ?? '') == 'Lingkungan' ? 'selected' : '' }}>
-                                                Pilar Lingkungan
+                                                Lingkungan
                                             </option>
                                         </select>
                                     </div>
 
                                     <!-- Filter: Bulan Realisasi -->
                                     <div
-                                        class="flex items-center gap-1.5 bg-gray-50 border border-gray-900 rounded-lg px-2.5 py-1 shadow-sm">
-                                        <label class="text-[10px] font-bold text-black uppercase">Bulan:</label>
+                                        class="flex items-center gap-1 bg-gray-50 border border-gray-900 rounded-md px-1.5 py-0.5 shadow-2xs">
+                                        <label class="text-[9px] font-bold text-black uppercase">Bulan:</label>
                                         <select name="g_bulan" onchange="submitFilter('filterForm')"
-                                            class="bg-transparent text-xs font-bold text-black outline-none cursor-pointer">
+                                            class="bg-transparent text-[11px] font-bold text-black outline-none cursor-pointer">
                                             <option value="all"
                                                 {{ ($bulanFilter ?? 'all') == 'all' ? 'selected' : '' }}>
                                                 Semua Bulan
@@ -233,10 +233,10 @@
 
                                     <!-- Filter: Kabupaten -->
                                     <div
-                                        class="flex items-center gap-1.5 bg-gray-50 border border-gray-900 rounded-lg px-2.5 py-1 shadow-sm">
-                                        <label class="text-[10px] font-bold text-black uppercase">Kab:</label>
+                                        class="flex items-center gap-1 bg-gray-50 border border-gray-900 rounded-md px-1.5 py-0.5 shadow-2xs">
+                                        <label class="text-[9px] font-bold text-black uppercase">Kab:</label>
                                         <select name="g_kabupaten" onchange="submitFilter('filterForm')"
-                                            class="bg-transparent text-xs font-bold text-black outline-none cursor-pointer max-w-[110px]">
+                                            class="bg-transparent text-[11px] font-bold text-black outline-none cursor-pointer max-w-[95px] truncate">
                                             <option value="all"
                                                 {{ ($kabupatenFilter ?? 'all') == 'all' ? 'selected' : '' }}>
                                                 Semua Kab
@@ -252,10 +252,10 @@
 
                                     <!-- Filter: Desa -->
                                     <div
-                                        class="flex items-center gap-1.5 bg-gray-50 border border-gray-900 rounded-lg px-2.5 py-1 shadow-sm">
-                                        <label class="text-[10px] font-bold text-black uppercase">Desa:</label>
+                                        class="flex items-center gap-1 bg-gray-50 border border-gray-900 rounded-md px-1.5 py-0.5 shadow-2xs">
+                                        <label class="text-[9px] font-bold text-black uppercase">Desa:</label>
                                         <select name="g_desa" onchange="submitFilter('filterForm')"
-                                            class="bg-transparent text-xs font-bold text-black outline-none cursor-pointer max-w-[110px]">
+                                            class="bg-transparent text-[11px] font-bold text-black outline-none cursor-pointer max-w-[95px] truncate">
                                             <option value="all"
                                                 {{ ($desaFilter ?? 'all') == 'all' ? 'selected' : '' }}>
                                                 Semua Desa
@@ -271,10 +271,10 @@
 
                                     <!-- Filter: Program -->
                                     <div
-                                        class="flex items-center gap-1.5 bg-gray-50 border border-gray-900 rounded-lg px-2.5 py-1 shadow-sm">
-                                        <label class="text-[10px] font-bold text-black uppercase">Program:</label>
+                                        class="flex items-center gap-1 bg-gray-50 border border-gray-900 rounded-md px-1.5 py-0.5 shadow-2xs">
+                                        <label class="text-[9px] font-bold text-black uppercase">Program:</label>
                                         <select name="g_program" onchange="submitFilter('filterForm')"
-                                            class="bg-transparent text-xs font-bold text-black outline-none cursor-pointer max-w-[140px]">
+                                            class="bg-transparent text-[11px] font-bold text-black outline-none cursor-pointer max-w-[110px] truncate">
                                             <option value="all"
                                                 {{ ($programFilter ?? 'all') == 'all' ? 'selected' : '' }}>
                                                 Semua Program
@@ -624,7 +624,7 @@
 
                                         <!-- 1. Filter: Tahun -->
                                         <div
-                                            class="flex items-center gap-1.5 bg-gray-50 border border-gray-400 rounded-lg px-2 py-1 shadow-sm">
+                                            class="flex items-center gap-1.5 bg-gray-50 border border-gray-900 rounded-lg px-2 py-1 shadow-sm">
                                             <label
                                                 class="text-[9px] font-bold text-gray-950 uppercase tracking-wider">Tahun:</label>
                                             <select name="tahun_sosmed" onchange="submitFilter('sosmedFilterForm')"
@@ -639,7 +639,7 @@
 
                                         <!-- [BARU] 2. Filter: Bulan -->
                                         <div
-                                            class="flex items-center gap-1.5 bg-gray-50 border border-gray-400 rounded-lg px-2 py-1 shadow-sm">
+                                            class="flex items-center gap-1.5 bg-gray-50 border border-gray-900 rounded-lg px-2 py-1 shadow-sm">
                                             <label
                                                 class="text-[9px] font-bold text-gray-950 uppercase tracking-wider">Bulan:</label>
                                             <select name="bulan_sosmed" onchange="submitFilter('sosmedFilterForm')"
@@ -656,7 +656,7 @@
 
                                         <!-- [BARU] 3. Filter: Kategori -->
                                         <div
-                                            class="flex items-center gap-1.5 bg-gray-50 border border-gray-400 rounded-lg px-2 py-1 shadow-sm">
+                                            class="flex items-center gap-1.5 bg-gray-50 border border-gray-900 rounded-lg px-2 py-1 shadow-sm">
                                             <label
                                                 class="text-[9px] font-bold text-gray-950 uppercase tracking-wider">Kategori:</label>
                                             <select name="kategori_konten" onchange="submitFilter('sosmedFilterForm')"
@@ -678,7 +678,7 @@
 
                                         <!-- 4. Filter: Tipe -->
                                         <div
-                                            class="flex items-center gap-1.5 bg-gray-50 border border-gray-400 rounded-lg px-2 py-1 shadow-sm">
+                                            class="flex items-center gap-1.5 bg-gray-50 border border-gray-900 rounded-lg px-2 py-1 shadow-sm">
                                             <label
                                                 class="text-[9px] font-bold text-gray-950 uppercase tracking-wider">Tipe:</label>
                                             <select name="tipe_konten" onchange="submitFilter('sosmedFilterForm')"
@@ -837,7 +837,7 @@
                                         <div class="flex flex-wrap items-center gap-2.5">
                                             <!-- Filter: Tahun -->
                                             <div
-                                                class="flex items-center gap-1.5 bg-gray-50 border border-gray-400 rounded-lg px-2 py-1 shadow-sm">
+                                                class="flex items-center gap-1.5 bg-gray-50 border border-gray-900 rounded-lg px-2 py-1 shadow-sm">
                                                 <label
                                                     class="text-[9px] font-bold text-gray-900 uppercase tracking-wider">Tahun:</label>
                                                 <select name="tahun_berita"
@@ -853,7 +853,7 @@
 
                                             <!-- Filter: Bulan -->
                                             <div
-                                                class="flex items-center gap-1.5 bg-gray-50 border border-gray-400 rounded-lg px-2 py-1 shadow-sm">
+                                                class="flex items-center gap-1.5 bg-gray-50 border border-gray-900 rounded-lg px-2 py-1 shadow-sm">
                                                 <label
                                                     class="text-[9px] font-bold text-gray-900 uppercase tracking-wider">Bulan:</label>
                                                 <select name="bulan_berita"

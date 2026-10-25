@@ -55,7 +55,6 @@
         inputTahunBaru: '',
         editModalHtml: '',
         loadingEdit: false,
-        laporanOpen: false,
     
         // Fungsi untuk mengaplikasikan tahun baru ke URL
         submitTahunBaru() {
@@ -103,7 +102,7 @@
             <header
                 class="min-h-[64px] bg-white border-b border-slate-200/80 px-4 py-2 sm:px-6 z-20 shrink-0 relative shadow-xs flex flex-col xl:flex-row xl:items-center justify-between gap-2">
 
-                <!-- SISI KIRI: JUDUL DASHBOARD, TOMBOL LAPORAN & LOGO SIARCOM -->
+                <!-- SISI KIRI: JUDUL DASHBOARD-->
                 <div class="flex items-center justify-between shrink-0 gap-3">
                     <div class="flex items-center gap-2.5">
                         <div class="p-1.5 bg-teal-50 rounded-lg border border-teal-100/80 text-[#27B78F]">
@@ -115,13 +114,6 @@
                             </h1>
                         </div>
                     </div>
-
-                    <!-- TOMBOL LAPORAN (DI SEBELAH KIRI / DEKAT JUDUL) -->
-                    <button type="button" @click="laporanOpen = true"
-                        class="px-3 py-1.5 rounded-xl text-[11px] font-bold transition flex items-center gap-1.5 shadow-xs cursor-pointer bg-gradient-to-r from-[#27B78F] to-[#12B4C9] hover:opacity-90 text-white shrink-0 ml-2">
-                        <i class="fa-solid fa-file-lines"></i>
-                        <span>Laporan</span>
-                    </button>
 
                     <!-- Logo SIARCOM Layar Kecil -->
                     <img src="{{ asset('img/siarcom.png') }}" alt="Logo SIARCOM"
@@ -352,16 +344,6 @@
                 <!-- Render HTML Edit secara dinamis dari Controller -->
                 <div x-show="!loadingEdit" x-html="editModalHtml"></div>
             </div>
-        </div>
-
-        <!-- Modal Laporan Sosial Media -->
-        <div x-show="laporanOpen" x-cloak
-            class="fixed inset-0 z-[60] flex items-center justify-center bg-black/40 p-4">
-
-            <div class="w-full max-w-6xl max-h-[90vh] overflow-y-auto sosmed-scrollbar">
-                @include('pages.post.partials.laporan')
-            </div>
-
         </div>
 
         <!-- Modal Kustom Tambah Tahun Sosmed -->
